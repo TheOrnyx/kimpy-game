@@ -51,7 +51,7 @@
   (handle-move)
   (focus-camera *camera*)
   (draw-all-objs)
-  (draw-obj *camera* *camera*)
+  ;; (draw-obj *camera* *camera*)
   (draw-obj *kimpy* *camera*) ; why is this orang :laughing-crying-emoji:
   (check-obj-collision-with-player))
 

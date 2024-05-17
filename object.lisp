@@ -106,9 +106,12 @@
   (:documentation "Draw the given object"))
 
 (defmethod draw-obj ((obj object) (cam camera))
-    (with-accessors ((x xpos) (y ypos) (pic img)
-		     (w width) (h height)) obj
-      (if pic
-	  (image pic x y w h)
-	  (with-pen (make-pen :fill +red+ :stroke +black+ :weight 2)
-	    (rect x y w h)))))
+  (with-accessors ((x xpos) (y ypos) (pic img) (w width) (h height) (midx mid-x) (midy mid-y)) obj
+    (with-accessors ((cam-x xpos) (cam-y ypos) (cam-midx mid-x) (cam-midy mid-y)) cam
+      (let ((draw-x (- (+ x midx) cam-x cam-midx))
+            (draw-y (- (+ y midy) cam-y cam-midy)))
+        (if pic
+            (image pic draw-x draw-y w h)
+            (with-pen (make-pen :fill +red+ :stroke +black+ :weight 2)
+              (rect draw-x draw-y w h)))))))
+
