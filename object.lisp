@@ -80,6 +80,14 @@
     (with-accessors ((y ypos)) obj
       (decf y vel))))
 
+(defgeneric colliding-p (obj other)
+  (:documentation "Return T if the two objects are colliding or nil if not")
+  (:method ((obj object) (other object))
+    (with-accessors ((obj-x xpos) (obj-y ypos) (obj-right right-x) (obj-btm btm-y)) obj
+      (with-accessors ((other-x xpos) (other-y ypos) (other-right right-x) (other-btm btm-y)) other
+	(not (or (> obj-x other-right) (< obj-right other-x)
+		 (< obj-btm other-y)   (> obj-y other-btm)))))))
+
 
 
 (defgeneric draw-obj (obj)
