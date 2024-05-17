@@ -102,10 +102,10 @@
 
 
 
-(defgeneric draw-obj (obj)
+(defgeneric draw-obj (obj cam)
   (:documentation "Draw the given object"))
 
-(defmethod draw-obj ((obj object))
+(defmethod draw-obj ((obj object) (cam camera))
     (with-accessors ((x xpos) (y ypos) (pic img)
 		     (w width) (h height)) obj
       (if pic

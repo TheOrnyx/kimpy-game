@@ -15,7 +15,7 @@
 
 (defmethod draw-object ((cam camera) (obj object))
   (when (colliding-p obj cam)
-    (draw-obj obj)))
+    (draw-obj obj cam)))
 
 (defmethod focus-camera ((cam camera))
   "refocus the gamera on the focused player."
@@ -23,7 +23,7 @@
       (setf (xpos cam) (- (mid-x plyer) (/ w 2.0))
 	    (ypos cam) (- (mid-y plyer) (/ h 2.0)))))
 
-(defmethod draw-obj ((cam camera))
+(defmethod draw-obj ((cam camera) (camr camera))
   "Draw a debug boundary for the camera to test stuff"
   (with-accessors ((x xpos) (y ypos) (pic img) (w width) (h height)) cam
     (with-pen (make-pen :stroke +red+ :weight 3)

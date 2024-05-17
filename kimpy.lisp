@@ -18,7 +18,8 @@
 (defun draw-all-objs ()
   "Draw all the objects in the *object-list*."
   (iter (iter:for obj iter:in *object-list*)
-    (draw-obj obj)))
+    (draw-object *camera* obj)))
+    ;; (draw-obj obj)))
 
 ;; TODO - maybe improve this later idk
 (defun check-obj-collision-with-player ()
@@ -50,8 +51,8 @@
   (handle-move)
   (focus-camera *camera*)
   (draw-all-objs)
-  (draw-obj *camera*)
-  (draw-obj *kimpy*) ; why is this orang :laughing-crying-emoji:
+  (draw-obj *camera* *camera*)
+  (draw-obj *kimpy* *camera*) ; why is this orang :laughing-crying-emoji:
   (check-obj-collision-with-player))
 
 (defmethod setup ((instance game) &key &allow-other-keys)
