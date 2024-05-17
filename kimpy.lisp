@@ -2,7 +2,10 @@
 
 (in-package #:kimpy)
 (defvar *kimpy* nil "The player character, kimpy :)")
+(defvar *camera* nil "The main camera to use for the game")
 (defparameter *object-list* '() "List of all the objects in the game")
+(defconstant +win-width+ 800 "The windows width")
+(defconstant +win-height+ 800 "The windows height")
 
 ;; The variables for the like movement keys
 (defparameter *right-key*	:scancode-d)
@@ -17,7 +20,7 @@
   (iter (iter:for obj iter:in *object-list*)
     (draw-obj obj)))
 
-;; TODO - maybe optimize this to quit once it's found one
+;; TODO - maybe improve this later idk
 (defun check-obj-collision-with-player ()
   "Check all of the object collisions with the player."
   (loop for obj in *object-list*
@@ -42,16 +45,20 @@
     (:down  (move-down *kimpy*))))
 
 (defsketch game
-    ((title "idk yet") (width 800) (height 800))
+    ((title "idk yet") (width +win-width+) (height +win-height+))
   (set-pen (make-pen :fill (rgb 0 0 0 0.0) :weight 4))
-  (draw-obj *kimpy*)
+  (handle-move)
+  (focus-camera *camera*)
   (draw-all-objs)
-  (check-obj-collision-with-player) ; why is this orang :laughing-crying-emoji:
-  (handle-move))
+  (draw-obj *camera*)
+  (draw-obj *kimpy*) ; why is this orang :laughing-crying-emoji:
+  (check-obj-collision-with-player))
 
 (defmethod setup ((instance game) &key &allow-other-keys)
   (setf *kimpy* (make-player :w 120 :h 120 :img-path "./data/sprites/kimpy/kimpy-draft1.png"
-			  :x 20 :y 20 :xvel 5 :yvel 5))
+			     :x 20 :y 20 :xvel 5 :yvel 5))
+  (setf *camera* (make-camera *kimpy* +win-width+ +win-height+))
+  ;; (setf *camera* (make-camera *kimpy* 400 400))
   (add-obj (make-obj :w 120 :h 120 :x 200 :y 500)))
 
 (defmethod kit.sdl2:mousebutton-event ((window game) state ts b x y)

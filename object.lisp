@@ -2,6 +2,8 @@
 
 (in-package #:kimpy)
 
+
+
 (defclass object ()
   ((xpos
     :initarg :xpos
@@ -37,7 +39,7 @@
     :initarg :img
     :initform nil
     :accessor img
-    :documentation "The image used to draw the object - draw red rectangle if nil"
+    :documentation "The image used to draw the object - if nil then draw red rectangle"
     )
    ))
 
@@ -57,6 +59,16 @@
   (:documentation "Get the right xpos value of the object")
   (:method (obj)
     (+ (xpos obj) (width obj))))
+
+(defgeneric mid-x (obj)
+  (:documentation "Get the middle x position of the object")
+  (:method ((obj object))
+    (+ (xpos obj) (/ (width obj) 2.0))))
+
+(defgeneric mid-y (obj)
+  (:documentation "Get the middle y position of the object")
+  (:method ((obj object))
+    (+ (ypos obj) (/ (height obj) 2.0))))
 
 (defgeneric move-right (obj &key vel)
   (:documentation "Increment the objects x position by it's velocity or by a provided one")
