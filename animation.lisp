@@ -3,25 +3,29 @@
 
 (defclass animation ()
   ((original-img
-   :initarg :orig-img
-   :initform (error "Must supply original image")
-   :accessor orig-img
-   :documentation "The original image to be cropped from")
-  (animation-frames
-   :initarg :frames
-   :initform (error "Must supply a list of animation frames")
-   :accessor anim-frames
-   :documentation "The list of animation frames to use")
-  (frame-count
-   :initarg :frame-count
-   :initform (error "Must supply a number of frames")
-   :accessor frame-count
-   :documentation "The number of frames in the animation")
-  (current-frame-num
-   :initarg :frame-start-num
-   :initform 0
-   :accessor current-frame-num
-   :documentation "The frame num currently being used")))
+    :initarg :orig-img
+    :initform (error "Must supply original image")
+    :accessor orig-img
+    :documentation "The original image to be cropped from")
+   (animation-frames
+    :initarg :frames
+    :initform (error "Must supply a list of animation frames")
+    :accessor anim-frames
+    :documentation "The list of animation frames to use")
+   (frame-count
+    :initarg :frame-count
+    :initform (error "Must supply a number of frames")
+    :accessor frame-count
+    :documentation "The number of frames in the animation")
+   (current-frame-num
+    :initarg :frame-start-num
+    :initform 0
+    :accessor current-frame-num
+    :documentation "The frame num currently being used")
+   (frames-since-switch
+    :initform 0
+    :accessor frames-since-switch
+    :documentation "The number of frames since the last switch")))
 
 (defclass animation-frame ()
   ((frame-num
@@ -53,7 +57,11 @@
     :initarg :frame-duration
     :initform 0
     :accessor frame-duration
-    :documentation "The frames duration for the animation frame")
+    :documentation "The frames duration for the animation frame (in milliseconds)")
+   (frames-till-switch
+    :initarg :frames-till-switch
+    :initform 0
+    :accessor frames-till-switch)
    (frame-img
     :initarg :frame-img
     :initform (error "Must supply a frame image")
@@ -64,10 +72,20 @@
   "Get the current animation frame"
   (aref (anim-frames anim) (current-frame-num anim)))
 
+(defun num-frames-till-switch (duration)
+  "The amount of frames till animation should switch"
+  (let* ((frame-dur (/ 1.0 +frame-rate+))
+	 (num-frames-till-switch (/ duration (* frame-dur 1000))))
+    num-frames-till-switch))
+
 (defmethod update-anim ((anim animation))
   "Update the animation and increase the current frame number etc"
   ;; TODO - add duration being a thing
-  (setf (current-frame-num anim) (mod (1+ (current-frame-num anim)) (frame-count anim))))
+  (with-accessors ((frame current-frame) (frames-switch frames-since-switch)
+		   (cur-frame-num current-frame-num) (frame-count frame-count)) anim
+    (when (>= (incf frames-switch 1) (frames-till-switch frame)) 
+      (setf cur-frame-num (mod (1+ cur-frame-num) frame-count))
+      (setf frames-switch 0))))
 
 (defmethod draw-anim-frame ((anim animation) &key (x 0) (y 0)
 					       (w (frame-w (current-frame anim)))
@@ -81,7 +99,7 @@
 ;;; The stuff for parsing and creating the animation
 
 (defun make-anim-frame (orig-img frame-data)
-  "Create and return an animation-frame object from the given frame-data hashtable and the original image to cut from"
+  "Create and return an animation-frame object from the given frame-data hashtable and the original image"
   (let* ((duration (gethash "duration" frame-data))
 	 (frame-number (gethash "filename" frame-data))
 	 (frame-info (gethash "frame" frame-data))
@@ -92,7 +110,8 @@
 	 (frame-cropped-img (crop orig-img frame-x frame-y frame-w frame-h)))
     (make-instance 'animation-frame :frame-duration duration :frame-y frame-y :frame-x frame-x
 				    :frame-w frame-w :frame-h frame-h :frame-num frame-number
-				    :frame-img frame-cropped-img)))
+				    :frame-img frame-cropped-img
+				    :frames-till-switch (num-frames-till-switch duration))))
 
 ;; TODO - check that using a vector is fine
 (defun make-anim-frames (orig-img img-data-path)
