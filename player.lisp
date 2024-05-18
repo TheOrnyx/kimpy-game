@@ -8,12 +8,12 @@
     :accessor collided
     :documentation "Whether or not the player has been collided with, T or nil")))
 
-(defun make-player (&key (w nil) (h nil) (x 0) (y 0) (xvel 0) (yvel 0) (img-path nil))
-  (let ((img
-	  (when img-path (load-resource img-path))))
+(defun make-player (&key (w nil) (h nil) (x 0) (y 0) (xvel 0) (yvel 0) (img-path nil) (img-data-path nil))
+  (let ((anim
+	  (when (and img-path img-data-path) (make-new-anim img-path img-data-path))))
     (make-instance 'player :xpos x :ypos y :width w :height h
 			   :xvel xvel :yvel yvel
-			   :img img)))
+			   :animation anim)))
 
 (defmethod draw-obj ((obj player) (cam object))
   (call-next-method)
@@ -21,4 +21,8 @@
 		   (w width) (h height)) obj
     (when (collided obj)
       (with-pen (make-pen :stroke +red+ :weight 2)
-	  (rect x y w h)))))
+	(rect x y w h)))))
+
+(defmethod update-player ((ply player))
+  (update-anim (anim ply))
+)

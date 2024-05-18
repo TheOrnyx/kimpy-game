@@ -69,6 +69,17 @@
   ;; TODO - add duration being a thing
   (setf (current-frame-num anim) (mod (1+ (current-frame-num anim)) (frame-count anim))))
 
+(defmethod draw-anim-frame ((anim animation) &key (x 0) (y 0)
+					       (w (frame-w (current-frame anim)))
+					       (h (frame-h (current-frame anim))))
+  (with-accessors ((frame current-frame)) anim
+    (if frame
+	(image (frame-img frame) x y w h)
+	(with-pen (make-pen :fill +red+ :stroke +black+ :weight 2)
+	  (rect x y w h)))))
+
+;;; The stuff for parsing and creating the animation
+
 (defun make-anim-frame (orig-img frame-data)
   "Create and return an animation-frame object from the given frame-data hashtable and the original image to cut from"
   (let* ((duration (gethash "duration" frame-data))
@@ -99,5 +110,4 @@
 	 (anim-frames (make-anim-frames full-img img-data-path)))
     (make-instance 'animation :frame-count (array-total-size anim-frames)
 			      :frames anim-frames :orig-img full-img)))
-
 

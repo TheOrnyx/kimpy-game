@@ -3,7 +3,7 @@
 (in-package #:kimpy)
 (defvar *kimpy* nil "The player character, kimpy :)")
 (defvar *camera* nil "The main camera to use for the game")
-(defparameter *object-list* '() "List of all the objects in the game")
+(defparameter *object-list* '() "List of all the objects in the game") ;; TODO - change this to a vector, didn't know lisp had them >:(
 (defconstant +win-width+ 800 "The windows width")
 (defconstant +win-height+ 800 "The windows height")
 
@@ -59,12 +59,14 @@
   (focus-camera *camera*)
   (draw-all-objs)
   (draw-obj *camera* *camera*)
-  (draw-obj *kimpy* *camera*) ; why is this orang :laughing-crying-emoji:
+  (draw-obj *kimpy* *camera*)
+  (update-player *kimpy*)
   (draw-debug-text)
   (check-obj-collision-with-player))
 
 (defmethod setup ((instance game) &key &allow-other-keys)
-  (setf *kimpy* (make-player :w 120 :h 120 :img-path "./data/sprites/kimpy/kimpy-draft1.png"
+  (setf *kimpy* (make-player :w 120 :h 120 :img-path "./data/sprites/kimpy/kimpy-animtest.png"
+			     :img-data-path #P"./data/sprites/kimpy/kimpy-animtest.json"
 			     :x 20 :y 20 :xvel 5 :yvel 5))
   (setf *camera* (make-camera *kimpy* +win-width+ +win-height+ 0.5))
   ;; (setf *camera* (make-camera *kimpy* 400 400 0.5))

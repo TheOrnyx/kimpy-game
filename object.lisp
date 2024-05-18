@@ -39,16 +39,19 @@
     :initarg :img
     :initform nil
     :accessor img
-    :documentation "The image used to draw the object - if nil then draw red rectangle"
-    )
-   ))
+    :documentation "The image used to draw the object - if nil then draw red rectangle")
+   (anim
+    :initarg :animation
+    :initform nil
+    :accessor anim
+    :documentation "The animation for the object - if nil then just draw a red rectangle")))
 
-(defun make-obj (&key (w nil) (h nil) (x 0) (y 0) (xvel 0) (yvel 0) (img-path nil))
-  (let ((img
-	(when img-path (load-resource img-path))))
+(defun make-obj (&key (w nil) (h nil) (x 0) (y 0) (xvel 0) (yvel 0) (img-path nil) (img-data-path nil))
+  (let ((anim
+	  (when (and img-path img-data-path) (make-new-anim img-path img-data-path))))
     (make-instance 'object :xpos x :ypos y :width w :height h
 			   :xvel xvel :yvel yvel
-			   :img img)))
+			   :animation anim)))
 
 (defgeneric btm-y (obj)
   (:documentation "Get the bottom y value of the object")
@@ -105,12 +108,12 @@
   (:documentation "Draw the given object"))
 
 (defmethod draw-obj ((obj object) (cam object))
-  (with-accessors ((x xpos) (y ypos) (pic img) (w width) (h height) (midx mid-x) (midy mid-y)) obj
+  (with-accessors ((x xpos) (y ypos) (animation anim) (w width) (h height) (midx mid-x) (midy mid-y)) obj
     (with-accessors ((cam-x xpos) (cam-y ypos) (cam-midx mid-x) (cam-midy mid-y)) cam
       (let ((draw-x (- midx cam-midx))
             (draw-y (- midy cam-midy)))
-        (if pic
-            (image pic draw-x draw-y w h)
+        (if animation
+            (draw-anim-frame animation :x draw-x :y draw-y)
             (with-pen (make-pen :fill +red+ :stroke +black+ :weight 2)
               (rect draw-x draw-y w h)))))))
 
