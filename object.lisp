@@ -101,15 +101,14 @@
 		 (< obj-btm other-y)   (> obj-y other-btm)))))))
 
 
-
 (defgeneric draw-obj (obj cam)
   (:documentation "Draw the given object"))
 
-(defmethod draw-obj ((obj object) (cam camera))
+(defmethod draw-obj ((obj object) (cam object))
   (with-accessors ((x xpos) (y ypos) (pic img) (w width) (h height) (midx mid-x) (midy mid-y)) obj
     (with-accessors ((cam-x xpos) (cam-y ypos) (cam-midx mid-x) (cam-midy mid-y)) cam
-      (let ((draw-x (- (+ x midx) cam-x cam-midx))
-            (draw-y (- (+ y midy) cam-y cam-midy)))
+      (let ((draw-x (- midx cam-midx))
+            (draw-y (- midy cam-midy)))
         (if pic
             (image pic draw-x draw-y w h)
             (with-pen (make-pen :fill +red+ :stroke +black+ :weight 2)

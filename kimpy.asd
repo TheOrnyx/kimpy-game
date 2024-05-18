@@ -9,4 +9,6 @@
   :depends-on (#:sketch #:alexandria)
   :components ((:file "package")
                (:file "kimpy")
-	       (:file "player")))
+	       (:file "player")
+	       (:file "camera")
+	       (:file "object")))

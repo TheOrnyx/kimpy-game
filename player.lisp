@@ -15,7 +15,7 @@
 			   :xvel xvel :yvel yvel
 			   :img img)))
 
-(defmethod draw-obj ((obj player) (cam camera))
+(defmethod draw-obj ((obj player) (cam object))
   (call-next-method)
   (with-accessors ((x xpos) (y ypos) (pic img)
 		   (w width) (h height)) obj

@@ -15,6 +15,13 @@
 (defparameter *x-move-dir* nil) ;; the x pos direction to move, can be :left, :right or nil for no movement
 (defparameter *y-move-dir* nil) ;; the y pos direction to move, can be :up, :down or nil for no movement
 
+(defun draw-debug-text ()
+  "Draw some debug text about position and stuff for player and camera"
+  (text (format nil "Player: x:~A, y:~A, midx:~A, midy:~A~%Camera: x:~A, y:~A, midx:~A, midy~A"
+		(xpos *kimpy*) (ypos *kimpy*) (mid-x *kimpy*) (mid-y *kimpy*)
+		(xpos *camera*) (ypos *camera*) (mid-x *camera*) (mid-y *camera*))
+	0 0))
+  
 (defun draw-all-objs ()
   "Draw all the objects in the *object-list*."
   (iter (iter:for obj iter:in *object-list*)
@@ -51,15 +58,16 @@
   (handle-move)
   (focus-camera *camera*)
   (draw-all-objs)
-  ;; (draw-obj *camera* *camera*)
+  (draw-obj *camera* *camera*)
   (draw-obj *kimpy* *camera*) ; why is this orang :laughing-crying-emoji:
+  (draw-debug-text)
   (check-obj-collision-with-player))
 
 (defmethod setup ((instance game) &key &allow-other-keys)
   (setf *kimpy* (make-player :w 120 :h 120 :img-path "./data/sprites/kimpy/kimpy-draft1.png"
 			     :x 20 :y 20 :xvel 5 :yvel 5))
-  (setf *camera* (make-camera *kimpy* +win-width+ +win-height+))
-  ;; (setf *camera* (make-camera *kimpy* 400 400))
+  (setf *camera* (make-camera *kimpy* +win-width+ +win-height+ 0.5))
+  ;; (setf *camera* (make-camera *kimpy* 400 400 0.5))
   (add-obj (make-obj :w 120 :h 120 :x 200 :y 500)))
 
 (defmethod kit.sdl2:mousebutton-event ((window game) state ts b x y)
