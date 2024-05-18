@@ -2,7 +2,9 @@
 
 (in-package #:kimpy)
 
-
+(defparameter *default-pen* (make-pen :fill +red+ :stroke +black+ :weight 3)
+  "The default pen for objects with no img")
+(defparameter *outline-pen* (make-pen :stroke +blue+ :weight 3) "Default pen that just strokes")
 
 (defclass object ()
   ((xpos
@@ -104,16 +106,16 @@
 		 (< obj-btm other-y)   (> obj-y other-btm)))))))
 
 
-(defgeneric draw-obj (obj cam)
+(defgeneric draw-obj (obj cam &key pen &allow-other-keys)
   (:documentation "Draw the given object"))
 
-(defmethod draw-obj ((obj object) (cam object))
-  (with-accessors ((x xpos) (y ypos) (animation anim) (w width) (h height) (midx mid-x) (midy mid-y)) obj
-    (with-accessors ((cam-x xpos) (cam-y ypos) (cam-midx mid-x) (cam-midy mid-y)) cam
-      (let ((draw-x (- midx cam-midx))
-            (draw-y (- midy cam-midy)))
+(defmethod draw-obj ((obj object) (cam object) &key (pen *default-pen*))
+  (with-accessors ((x xpos) (y ypos) (animation anim) (w width) (h height)) obj
+    (with-accessors ((cam-x xpos) (cam-y ypos)) cam
+      (let ((draw-x (- x cam-x))
+            (draw-y (- y cam-y)))
         (if animation
             (draw-anim-frame animation :x draw-x :y draw-y)
-            (with-pen (make-pen :fill +red+ :stroke +black+ :weight 2)
+            (with-pen pen
               (rect draw-x draw-y w h)))))))
 

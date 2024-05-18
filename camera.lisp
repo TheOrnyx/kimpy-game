@@ -32,7 +32,7 @@
 (defmethod focus-camera ((cam camera))
   "refocus the gamera on the focused player."
   (with-accessors ((plyer focused-player) (w width) (h height) (inner-obj inner-bound-obj)) cam
-    (when (not (colliding-p inner-obj plyer))
+    (when t ;(not (colliding-p inner-obj plyer))
       (with-accessors ((inner-x xpos) (inner-y ypos) (inner-w width) (inner-h height)) inner-obj
 	(setf (xpos cam) (- (mid-x plyer) (/ w 2.0))
 	      (ypos cam) (- (mid-y plyer) (/ h 2.0))
@@ -40,11 +40,8 @@
 	      inner-y (- (mid-y plyer) (/ inner-h 2.0))
 	      )))))
 
-(defmethod draw-obj ((cam camera) (camr object))
+(defmethod draw-obj ((cam camera) (camr object) &key (pen *outline-pen*))
   "Draw a debug boundary for the camera to test stuff"
-  (with-accessors ((x xpos) (y ypos) (pic img) (w width) (h height) (inner inner-bound-obj)) cam
-    (with-accessors ((inner-x xpos) (inner-y ypos) (inner-w width) (inner-h height)) inner
-      (with-pen (make-pen :stroke +red+ :weight 3)
-	(rect x y w h)
-	(rect inner-x inner-y inner-w inner-h)))))
+  ;; (call-next-method)
+  (draw-obj (inner-bound-obj cam) cam :pen pen))
   

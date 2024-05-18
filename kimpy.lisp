@@ -6,6 +6,7 @@
 (defparameter *object-list* '() "List of all the objects in the game") ;; TODO - change this to a vector, didn't know lisp had them >:(
 (defconstant +win-width+ 800 "The windows width")
 (defconstant +win-height+ 800 "The windows height")
+(defconstant +frame-rate+ 60 "the games frame rate")
 
 ;; The variables for the like movement keys
 (defparameter *right-key*	:scancode-d)
@@ -65,9 +66,9 @@
   (check-obj-collision-with-player))
 
 (defmethod setup ((instance game) &key &allow-other-keys)
-  (setf *kimpy* (make-player :w 120 :h 120 :img-path "./data/sprites/kimpy/kimpy-animtest.png"
+  (setf *kimpy* (make-player :img-path "./data/sprites/kimpy/kimpy-animtest.png"
 			     :img-data-path #P"./data/sprites/kimpy/kimpy-animtest.json"
-			     :x 20 :y 20 :xvel 5 :yvel 5))
+			     :x 0 :y 0 :xvel 5 :yvel 5))
   (setf *camera* (make-camera *kimpy* +win-width+ +win-height+ 0.5))
   ;; (setf *camera* (make-camera *kimpy* 400 400 0.5))
   (add-obj (make-obj :w 120 :h 120 :x 200 :y 500)))
