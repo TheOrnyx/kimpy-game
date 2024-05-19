@@ -1,9 +1,10 @@
 # kimpy
-### _Your Name <your.name@example.com>_
+### _Ornyx_
 
-This is a project to do ... something.
+Silly haha game I'm working on (probably abandoned tho or smth) for the lisp
+game jam
 
 ## License
 
-Specify license here
+idk
 
