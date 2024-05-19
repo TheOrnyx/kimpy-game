@@ -40,8 +40,8 @@
 	      inner-y (- (mid-y plyer) (/ inner-h 2.0))
 	      )))))
 
-(defmethod draw-obj ((cam camera) (camr object) &key (pen *outline-pen*))
+(defmethod draw-obj ((cam camera) (camr object) &key (pen *outline-pen*)))
   "Draw a debug boundary for the camera to test stuff"
   ;; (call-next-method)
-  (draw-obj (inner-bound-obj cam) cam :pen pen))
+  ;; (draw-obj (inner-bound-obj cam) cam :pen pen))
   

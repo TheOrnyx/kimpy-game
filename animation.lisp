@@ -1,6 +1,8 @@
 ;;;; Animation.lisp
 ;;;; a basic kinda class and stuff to seperate like spritesheets into a list of images
 
+(in-package #:kimpy)
+
 (defclass animation ()
   ((original-img
     :initarg :orig-img

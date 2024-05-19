@@ -37,7 +37,7 @@
     :initform (error ":height must be specified")
     :accessor height
     :documentation "The objects height")
-   (img
+   (img ; TODO - probably not needed anymore, remove
     :initarg :img
     :initform nil
     :accessor img
@@ -46,7 +46,17 @@
     :initarg :animation
     :initform nil
     :accessor anim
-    :documentation "The animation for the object - if nil then just draw a red rectangle")))
+    :documentation "The animation for the object - if nil then just draw a red rectangle")
+   (move-x-dir
+    :initarg :x-dir
+    :initform nil
+    :accessor move-x-dir
+    :documentation "The X direction for this object to move - can either be nil for still or :left/:right")
+   (move-y-dir
+    :initarg y-dir
+    :initform nil
+    :accessor move-y-dir
+    :documentation "The y direction to move - can either be nil to stay still or :up/:down")))
 
 (defun make-obj (&key (w nil) (h nil) (x 0) (y 0) (xvel 0) (yvel 0) (img-path nil) (img-data-path nil))
   (let ((anim
@@ -97,6 +107,16 @@
     (with-accessors ((y ypos)) obj
       (decf y vel))))
 
+(defgeneric handle-move (obj)
+  (:documentation "Handle the movement of an object based on the move-dir slots")
+  (:method ((obj object))
+    (alexandria:switch ((move-x-dir obj)) ; handle x movment
+      (:left (move-left obj))
+      (:right (move-right obj)))
+    (alexandria:switch ((move-y-dir obj)) ; handle y movement
+      (:up (move-up obj))
+      (:down (move-down obj)))))
+
 (defgeneric colliding-p (obj other)
   (:documentation "Return T if the two objects are colliding or nil if not")
   (:method ((obj object) (other object))
@@ -105,17 +125,36 @@
 	(not (or (> obj-x other-right) (< obj-right other-x)
 		 (< obj-btm other-y)   (> obj-y other-btm)))))))
 
+(defgeneric x-pos-rel (obj cam)
+  (:documentation "Get object x position relative to the camera")
+  (:method ((obj object) (cam object))
+    (- (xpos obj) (xpos cam))))
+
+(defgeneric y-pos-rel (obj cam)
+  (:documentation "Get object y position relative to the camera")
+  (:method ((obj object) (cam object))
+    (- (ypos obj) (ypos cam))))
+
+(defgeneric mid-x-rel (obj cam)
+  (:documentation "Get the relative middle x position of the obj")
+  (:method ((obj object) (cam object))
+    (+ (x-pos-rel obj cam) (/ (width obj) 2.0))))
+
+(defgeneric mid-y-rel (obj cam)
+  (:documentation "Get the relative middle y position of the obj")
+  (:method ((obj object) (cam object))
+    (+ (y-pos-rel obj cam) (/ (height obj) 2.0))))
+
 
 (defgeneric draw-obj (obj cam &key pen &allow-other-keys)
   (:documentation "Draw the given object"))
 
 (defmethod draw-obj ((obj object) (cam object) &key (pen *default-pen*))
-  (with-accessors ((x xpos) (y ypos) (animation anim) (w width) (h height)) obj
-    (with-accessors ((cam-x xpos) (cam-y ypos)) cam
-      (let ((draw-x (- x cam-x))
-            (draw-y (- y cam-y)))
-        (if animation
-            (draw-anim-frame animation :x draw-x :y draw-y)
-            (with-pen pen
-              (rect draw-x draw-y w h)))))))
+  (let ((draw-x (x-pos-rel obj cam))
+	(draw-y (y-pos-rel obj cam))
+	(animation (anim obj)))
+    (if animation
+	(draw-anim-frame animation :x draw-x :y draw-y)
+	(with-pen pen
+	  (rect draw-x draw-y (width obj) (height obj))))))
 

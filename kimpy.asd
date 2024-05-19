@@ -7,9 +7,10 @@
   :version "0.0.1"
   :serial t
   :depends-on (#:sketch #:alexandria #:com.inuoe.jzon)
+  
   :components ((:file "package")
-               (:file "kimpy")
+               (:file "object")
+	       (:file "kimpy")
 	       (:file "player")
 	       (:file "camera")
-	       (:file "object")
 	       (:file "animation")))
