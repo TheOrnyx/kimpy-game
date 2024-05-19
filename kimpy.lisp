@@ -37,6 +37,11 @@ Mouse : X:~A, y:~A"
 		(xpos *camera*) (ypos *camera*) (mid-x *camera*) (mid-y *camera*)
 		(mouse-x *game-info*) (mouse-y *game-info*))
 	0 0))
+
+(defun update-all-objs ()
+  "Update all the objects in the object list."
+  (iter (iter:for obj iter:in *object-list*)
+    (update-obj obj)))
   
 (defun draw-all-objs ()
   "Draw all the objects in the *object-list*."
@@ -69,6 +74,7 @@ Mouse : X:~A, y:~A"
   (draw-obj *camera* *camera*)
   (draw-obj *kimpy* *camera*)
   (update-player *kimpy*)
+  (update-all-objs)
   (draw-debug-text)
   (check-obj-collision-with-player))
 
@@ -76,10 +82,12 @@ Mouse : X:~A, y:~A"
   (setf *kimpy* (make-player :img-path "./data/sprites/kimpy/kimpy-animtest.png"
 			     :img-data-path #P"./data/sprites/kimpy/kimpy-animtest.json"
 			     :x 0 :y 0 :xvel 5 :yvel 5 ))
-  (setf (player-weapon *kimpy*) (make-instance 'weapon :width 100 :height 50 :parent *kimpy*))
+  (setf (player-weapon *kimpy*) (make-weapon :w 100 :h 50 :parent *kimpy*))
+					     ;; :img-path "./data/sprites/kimpy/kimpy-knif.png"
+					     ;; :img-data-path #P"./data/sprites/kimpy/kimpy-knif.json"))
   (setf *camera* (make-camera *kimpy* +win-width+ +win-height+ 0.5))
   ;; (setf *camera* (make-camera *kimpy* 400 400 0.5))
-  (add-obj (make-obj :w 120 :h 120 :x 200 :y 500))
+  (add-obj (make-obj :w 120 :h 120 :x 200 :y 500 :xvel 2 :x-dir :right))
   (setf *game-info* (make-instance 'game-info :height 0 :width 0)))
 
 (defmethod kit.sdl2:mousebutton-event ((window game) state ts b x y)

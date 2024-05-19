@@ -13,13 +13,14 @@
     :accessor player-weapon
     :documentation "The players weapon - if nil then no weapon")))
 
-(defun make-player (&key (w nil) (h nil) (x 0) (y 0) (xvel 0) (yvel 0) (img-path nil) (img-data-path nil))
+(defun make-player (&key (w nil) (h nil) (x 0) (y 0) (xvel 0) (yvel 0) (img-path nil) (img-data-path nil)
+		      (x-dir nil) (y-dir nil))
   (let* ((anim
 	   (when (and img-path img-data-path) (make-new-anim img-path img-data-path)))
 	 (width  (if w w (frame-w (current-frame anim))))
 	 (height (if h h (frame-h (current-frame anim)))))
     (make-instance 'player :xpos x :ypos y :width width :height height
-			   :xvel xvel :yvel yvel :animation anim)))
+			   :xvel xvel :yvel yvel :animation anim :x-dir x-dir :y-dir y-dir)))
 
 (defmethod draw-obj ((obj player) (cam object) &key (pen *outline-pen*))
   (call-next-method)
@@ -46,13 +47,20 @@
     :documentation "The parent object to attach the weapon to")))
 
 (defmethod draw-obj ((obj weapon) (cam object) &key (pen *default-pen*))
-  (with-accessors ((parent parent) (w width) (h height)) obj
-    (let* ((player-x (mid-x-rel parent cam)) (player-y (mid-y-rel parent cam))
+  (with-accessors ((parent parent) (w width) (h height) (animation anim)) obj
+    (let* ((player-x (right-x-rel parent cam)) (player-y (mid-y-rel parent cam))
 	   (delta-x (- player-x (mouse-x *game-info*)))
 	   (delta-y (- player-y (mouse-y *game-info*)))
-	   (delta (if (or (= 0 delta-x) (= 0 delta-y))
-		      0 (/ (float delta-y) (float delta-x)))))
+	   (x-rot-offset (- 0 w)) (y-rot-offset (- 0 (/ h 2))))
+      (with-pen pen (rect player-x player-y w h))
       (with-translate (player-x player-y)
 	(with-rotate ((degrees (atan delta-y delta-x)))
-	  (with-pen pen
-	    (rect 0 0 w h)))))))
+	  (if animation
+	      (draw-anim-frame animation :x x-rot-offset :y y-rot-offset :w w :h h)
+	      (with-pen pen
+		(rect x-rot-offset y-rot-offset w h))))))))
+
+(defun make-weapon (&key (w nil) (h nil) (img-path nil) (img-data-path nil) (parent nil))
+  (let ((anim
+	  (when (and img-path img-data-path) (make-new-anim img-path img-data-path))))
+    (make-instance 'weapon :width w :height h :animation anim :parent parent)))

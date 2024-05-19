@@ -53,17 +53,23 @@
     :accessor move-x-dir
     :documentation "The X direction for this object to move - can either be nil for still or :left/:right")
    (move-y-dir
-    :initarg y-dir
+    :initarg :y-dir
     :initform nil
     :accessor move-y-dir
     :documentation "The y direction to move - can either be nil to stay still or :up/:down")))
 
-(defun make-obj (&key (w nil) (h nil) (x 0) (y 0) (xvel 0) (yvel 0) (img-path nil) (img-data-path nil))
+(defun make-obj (&key (w nil) (h nil) (x 0) (y 0) (xvel 0) (yvel 0) (img-path nil) (img-data-path nil)
+		   (x-dir nil) (y-dir nil))
   (let ((anim
 	  (when (and img-path img-data-path) (make-new-anim img-path img-data-path))))
     (make-instance 'object :xpos x :ypos y :width w :height h
-			   :xvel xvel :yvel yvel
+			   :xvel xvel :yvel yvel :x-dir x-dir :y-dir y-dir
 			   :animation anim)))
+
+(defgeneric update-obj (obj)
+  (:documentation "Update the object and stuff")
+  (:method ((obj object))
+    (handle-move obj)))
 
 (defgeneric btm-y (obj)
   (:documentation "Get the bottom y value of the object")
@@ -144,6 +150,15 @@
   (:documentation "Get the relative middle y position of the obj")
   (:method ((obj object) (cam object))
     (+ (y-pos-rel obj cam) (/ (height obj) 2.0))))
+
+(defgeneric right-x-rel (obj cam)
+  (:documentation "Get the relative right x position of the obj")
+  (:method ((obj object) (cam object))
+    (+ (x-pos-rel obj cam) (width obj))))
+(defgeneric btm-y-rel (obj cam)
+  (:documentation "Get the relative bottom y position of the obj")
+  (:method ((obj object) (cam object))
+    (+ (y-pos-rel obj cam) (height obj))))
 
 
 (defgeneric draw-obj (obj cam &key pen &allow-other-keys)
