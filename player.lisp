@@ -26,13 +26,10 @@
   (call-next-method)
   (when (player-weapon obj)
     (draw-obj (player-weapon obj) cam))
-  (with-accessors ((x xpos) (y ypos) (pic img)
-		   (w width) (h height)) obj
+  (with-accessors ((pic img) (w width) (h height)) obj
     (when (collided obj)
-      (let ((draw-x (- x (xpos cam)))
-	    (draw-y (- y (ypos cam))))
-	(with-pen pen
-	  (rect draw-x draw-y w h))))))
+      (with-pen pen
+	(rect (x-pos-rel obj cam) (y-pos-rel obj cam) w h)))))
 
 (defmethod update-player ((ply player))
   (update-anim (anim ply))
@@ -52,7 +49,7 @@
 	   (delta-x (- player-x (mouse-x *game-info*)))
 	   (delta-y (- player-y (mouse-y *game-info*)))
 	   (x-rot-offset (- 0 w)) (y-rot-offset (- 0 (/ h 2))))
-      (with-pen pen (rect player-x player-y w h))
+      ;; (with-pen pen (rect player-x player-y w h))
       (with-translate (player-x player-y)
 	(with-rotate ((degrees (atan delta-y delta-x)))
 	  (if animation
